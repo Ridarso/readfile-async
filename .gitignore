@@ -1,0 +1,14 @@
+.vscode
+
+node_modules
+/logs
+*.log
+.nvm
+/build
+/__nedb__
+
+.AppleDouble
+.DS_Store
+.LSOverride
+
+/coverage
