@@ -10,9 +10,7 @@
     "sourceMap": false,
     "declaration": false,
     "removeComments": true,
-    "types": [
-      "node"
-    ]
+    "types": [],
   },
   "include": [
     "src/**/*.ts"

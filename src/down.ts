@@ -13,20 +13,40 @@ function sleep(ms) {
 	return new Promise(resolve => setTimeout(resolve, ms));
 }
 
-function readlines(input) {
-	const output = new stream.PassThrough({ objectMode: true });
-	
-	const rl = readline.createInterface(input);
+// function readlines(input) {
+// 	const output = new stream.PassThrough({ objectMode: true });
+// 	const rl = readline.createInterface(input);
+// 	rl.on("line", line => {
+// 		output.write(line);
+// 	});
 
-	rl.on("line", line => {
-		output.write(line);
+// 	rl.on("close", () => {
+// 		output.push(null);
+// 	}); 
+// 	console.log('output', output);
+// 	return output;
+// }
+
+function readlines(stream) {
+	return new Promise((resolve, reject) => {
+		let rl = readline.createInterface({
+				input: stream
+		});
+		let data = [];
+		rl.on('line', (line) => {
+			data.push(line);
+		}).on('close', () => {
+			resolve(data);
+		}).on('error', err => {
+			reject(err);
+		})
 	});
+}
 
-	rl.on("close", () => {
-		output.push(null);
-	}); 
-
-	return output;
+async function loopCallback(list, callback, acct = []) {
+	if(list.length === 0) return acct;
+	const [head, ...tail] = list;
+	return loopCallback(tail, callback, [...acct, await callback(head)]);
 }
 
 dotenv.config({
@@ -36,24 +56,14 @@ dotenv.config({
 
 (async() => {
 	const input = fs.createReadStream(process.env.INPUT_FILE);
-	// var cnt = 0;
-
-	for await (const line of readlines(input)) {
-	// for (var i = 0; i < n; ++i) {
-		// var line = 'Hi';
-		
-		console.log(`${line}`);
-
-		/*
-		await client.publish("test1/devA/down", `${cnt}|${line}`, {
-			qos: 2,
-		});
-		*/
-		
-		// ++cnt;
+	var cnt = 0;
+	const list = await readlines(input);
+	await loopCallback(list, async (line) => {
+		console.log(`${cnt}|${line}`);
+		++cnt;
 		
 		await sleep(1000);
-	}
+	});
 	console.error("Done");
 })();
 
